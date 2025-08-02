@@ -376,9 +376,14 @@ export default function CampaignForm() {
         value={formData.description}
         onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
         placeholder="Tell your story."
-        maxLength={1000}
+        // maxLength={1000}
         showTips={showDescriptionTips}
         onToggleTips={() => setShowDescriptionTips(!showDescriptionTips)}
+        onWriteWithAI={() => {
+          // Add your AI integration logic here
+          console.log('Write with AI clicked');
+          // You can integrate with OpenAI, Claude, or other AI services
+        }}
       />
 
       {/* Donation Target */}
@@ -408,9 +413,27 @@ export default function CampaignForm() {
       {/* Submit Button */}
       <button
         type="submit"
-        disabled={createCampaignMutation.isPending || uploading || additionalImageFiles.length < 3 || additionalImageFiles.length > 5}
+        disabled={
+          createCampaignMutation.isPending || 
+          uploading || 
+          !formData.name.trim() ||
+          !formData.media ||
+          !formData.category ||
+          !formData.description.trim() ||
+          !formData.donationTarget ||
+          additionalImageFiles.length < 3 || 
+          additionalImageFiles.length > 5
+        }
         className={`bg-register-green text-white px-6 py-2 rounded-md transition-colors ${
-          createCampaignMutation.isPending || uploading || additionalImageFiles.length < 3 || additionalImageFiles.length > 5
+          createCampaignMutation.isPending || 
+          uploading || 
+          !formData.name.trim() ||
+          !formData.media ||
+          !formData.category ||
+          !formData.description.trim() ||
+          !formData.donationTarget ||
+          additionalImageFiles.length < 3 || 
+          additionalImageFiles.length > 5
             ? 'opacity-50 cursor-not-allowed' 
             : 'hover:bg-green-600'
         }`}

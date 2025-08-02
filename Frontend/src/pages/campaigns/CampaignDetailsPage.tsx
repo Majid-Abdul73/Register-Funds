@@ -288,15 +288,13 @@ export default function CampaignDetailsPage() {
                   {/* Updates Manager */}
                   <UpdatesManager 
                     campaignId={campaign.id}
+                    campaign={campaign}
                   />
                 </div>
 
                 {/* Impact Report Upload Section */}
-                <div className="border-t-2 border-b-2 py-6 md:py-8">
-                  <h2 className="text-xl font-bold mb-4">Impact Report</h2>
-                  <p className="text-gray-600 text-sm mb-6">
-                    Upload the impact report to show the progress and outcomes of this campaign.
-                  </p>
+                <div className="py-6 md:py-8">
+                  <h2 className="text-xl px-5 font-bold mb-4">Impact Report</h2>
                   <ImpactReportUpload
                     campaignId={campaign.id}
                     onUploadSuccess={(reportUrl) => {
@@ -348,22 +346,21 @@ export default function CampaignDetailsPage() {
                 <div className="rounded-lg shadow-sm py-6 px-4">
                   <h2 className="font-medium mb-4">Organizer</h2>
                   <div className="flex items-center">
-                    <img 
-                      src={campaign.organizer?.profileImage || '/avatar.svg'} 
-                      alt={campaign.organizer?.name || 'Anonymous'}
-                      className="w-10 h-10 rounded-full mr-3"
-                    />
+                    <div className="w-10 h-10 rounded-full mr-3 bg-register-green flex items-center justify-center text-white font-semibold">
+                      {campaign.organizer?.name?.charAt(0).toUpperCase()}
+                    </div>
+
                     <div>
                       <p className="font-medium">{campaign.organizer?.name}</p>
-                      <p className="text-sm text-gray-500">Campaign organizer</p>
+                      <p className="text-sm text-gray-500">{campaign.organizer?.role || 'Campaign organizer'}</p>
                     </div>
+
                   </div>
                 </div>
               </div>
 
               
             </div>
-
             {/* Right Column - Donation Info */}
             <div className="space-y-6">
               <h2 className="text-lg font-semibold mb-4">Goals & Donation</h2>

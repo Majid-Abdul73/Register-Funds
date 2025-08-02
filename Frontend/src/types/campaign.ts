@@ -20,6 +20,7 @@ export interface Campaign {
   organizer?: {
     name: string;
     profileImage?: string;
+    role?: string;
   };
   impactReport?: {
     url: string;

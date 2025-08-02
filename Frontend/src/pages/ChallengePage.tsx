@@ -149,15 +149,12 @@ const ChallengePage = () => {
 
 
               {/* Impact report section */}
-              <div className="border-t-2 border-b-2 py-8 md:py-12 max-w-2xl">
+              <div className="py-8 md:py-12 max-w-2xl">
                 <h2 className="text-xl font-bold mb-4">Impact Report</h2>
-                <p className="text-gray-600 text-sm mb-6">
-                  View the impact report to see the progress and outcomes of this campaign.
-                </p>
+    
                 <ImpactReportViewer
                   reportUrl={campaign.impactReport?.url}
                   reportName={campaign.impactReport?.fileName || 'Impact Report'}
-                  uploadDate={campaign.impactReport?.uploadDate ? new Date(campaign.impactReport.uploadDate).toLocaleDateString() : undefined}
                 />
               </div>
 
@@ -184,7 +181,7 @@ const ChallengePage = () => {
             <div className="py-8 max-w-2xl">
               <h2 className="text-xl font-bold mb-4">Organizer</h2>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-8 h-8 rounded-full shadow bg-register-green flex items-center justify-center text-white text-xs font-semibold">
+                <div className="w-10 h-10 rounded-full shadow bg-register-green flex items-center justify-center text-white text-xs font-semibold">
                   {campaign.organizer?.name?.charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -198,7 +195,6 @@ const ChallengePage = () => {
                 {schoolLoading ? 'Loading...' : (school?.schoolName || 'School name not available')}
               </h3>
               
-              {/* // Also update the location display to use school data if campaign location is not available: */}
               <div className="flex items-center gap-2 mb-4">
                 <img src="/images/location-b.svg" alt="" className="w-5 h-5" />
                 <span className="text-sm md:text-base">

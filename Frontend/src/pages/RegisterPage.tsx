@@ -36,6 +36,7 @@ export default function RegisterPage() {
     email: '',
     phone: '',
     staffId: '',
+    emisCode: '', // Add EMIS Code field
     password: '',
     confirmPassword: '',
     acceptTerms: false
@@ -84,6 +85,13 @@ export default function RegisterPage() {
     if (!formData.city) errors.city = 'City is required';
     if (!formData.schoolType) errors.schoolType = 'School type is required';
     
+    // EMIS Code validation
+    if (!formData.emisCode.trim()) {
+      errors.emisCode = 'EMIS Code is required';
+    } else if (!/^[A-Z0-9]{6,12}$/.test(formData.emisCode.trim())) {
+      errors.emisCode = 'EMIS Code must be 6-12 characters long and contain only uppercase letters and numbers';
+    }
+    
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -94,7 +102,6 @@ export default function RegisterPage() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
     if (!formData.addressLine1.trim()) errors.addressLine1 = 'Address Line 1 is required';
-    if (!formData.addressLine2.trim()) errors.addressLine2 = 'Address Line 2 is required';
     if (!formData.digitalAddress.trim()) errors.digitalAddress = 'Digital Address is required';
     if (!formData.townCity.trim()) errors.townCity = 'Town/City is required';
     if (!formData.districtRegion.trim()) errors.districtRegion = 'District/Region is required';
@@ -137,9 +144,13 @@ export default function RegisterPage() {
     }
     if (!formData.phone.trim()) errors.phone = 'Phone number is required';
     
-    // Add staffId validation (optional field, but if provided should not be empty)
-    if (formData.staffId && !formData.staffId.trim()) {
-      errors.staffId = 'Staff ID cannot be empty if provided';
+    // Enhanced Staff ID validation
+    if (!formData.staffId.trim()) {
+      errors.staffId = 'Staff ID is required';
+    } else if (formData.staffId.trim().length < 3) {
+      errors.staffId = 'Staff ID must be at least 3 characters long';
+    } else if (!/^[A-Za-z0-9-_]+$/.test(formData.staffId.trim())) {
+      errors.staffId = 'Staff ID can only contain letters, numbers, hyphens, and underscores';
     }
     
     setValidationErrors(errors);
@@ -215,6 +226,7 @@ export default function RegisterPage() {
         country: formData.country,
         city: formData.city,
         schoolType: formData.schoolType,
+        emisCode: formData.emisCode, // Add EMIS Code to saved data
         // Include address fields
         addressLine1: formData.addressLine1,
         addressLine2: formData.addressLine2,
@@ -310,7 +322,7 @@ export default function RegisterPage() {
 
       {/* Right Section */}
       <div className="w-full md:w-1/2 p-4 md:p-8 flex flex-col">
-        <div className="max-w-md mx-auto w-full flex-grow flex flex-col">
+        <div className="max-w-2xl mx-auto w-full flex-grow flex flex-col">
           <div className="text-right mb-4 md:mb-8">
             <span className="text-sm text-gray-600">Have an account already? </span>
             <Link to="/login" className="text-sm text-gray-900 font-medium hover:text-register-green">

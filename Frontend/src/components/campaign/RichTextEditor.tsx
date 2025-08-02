@@ -11,6 +11,7 @@ interface RichTextEditorProps {
   maxLength?: number;
   showTips?: boolean;
   onToggleTips?: () => void;
+  onWriteWithAI?: () => void; // Add AI button handler
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -19,7 +20,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = "Enter your description...",
   maxLength = 200,
   showTips = false,
-  onToggleTips
+  onToggleTips,
+  onWriteWithAI // Add the new prop
 }) => {
   const [editorState, setEditorState] = useState(() => {
     if (value) {
@@ -266,8 +268,24 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </div>
         </div>
         
+        
+        
+        {/* Write with AI Button */}
+        {onWriteWithAI && (
+          <button
+            type="button"
+            onClick={onWriteWithAI}
+            className="absolute bottom-4 right-1 bg-black text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors flex items-center gap-2 shadow-lg"
+            title="Generate content with AI"
+          >
+            <span className='text-lg font-medium'>Write with AI</span>
+            <img src="/ai.svg" alt="" className='w-6 h-6'/>
+          </button>
+        )}
+
+
         {/* Character Counter */}
-        <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+        <div className="absolute bottom-2 left-4 text-xs text-gray-500">
           {currentLength}/{maxLength}
         </div>
       </div>

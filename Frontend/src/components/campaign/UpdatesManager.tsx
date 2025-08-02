@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useCampaignUpdates, useCreateUpdate, useUpdateUpdate, useDeleteUpdate } from '../../hooks/useUpdates';
+import { Campaign } from '../../types/campaign';
 
 interface UpdatesManagerProps {
   campaignId: string;
+  campaign?: Campaign; // Add campaign prop to access organizer info
 }
 
-export default function UpdatesManager({ campaignId }: UpdatesManagerProps) {
+export default function UpdatesManager({ campaignId, campaign }: UpdatesManagerProps) {
   const [isAddingUpdate, setIsAddingUpdate] = useState(false);
   const [editingUpdate, setEditingUpdate] = useState<string | null>(null);
   const [newUpdateContent, setNewUpdateContent] = useState('');
@@ -24,7 +26,10 @@ export default function UpdatesManager({ campaignId }: UpdatesManagerProps) {
       await createUpdateMutation.mutateAsync({
         content: newUpdateContent.trim(),
         campaignId,
-        author: 'Campaign Organizer' // Replace with real user data
+        author: {
+          name: campaign?.organizer?.name || 'Campaign Organizer',
+          role: 'Campaign Organizer'
+        }
       });
       
       setNewUpdateContent('');
@@ -148,7 +153,7 @@ export default function UpdatesManager({ campaignId }: UpdatesManagerProps) {
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start w-full gap-3 mb-2">
                   <div className="flex items-center gap-2 text-gray-600 text-sm">
                     <span>{new Date(update.createdAt).toLocaleDateString()}</span>
-                    <span>by {update.author}</span>
+                    <span>by {update.author?.name || 'Unknown Author'}</span>
                   </div>
                   <div className="flex gap-2">
                     <button

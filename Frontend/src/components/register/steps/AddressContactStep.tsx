@@ -32,7 +32,7 @@ const AddressContactStep: React.FC<AddressContactStepProps> = ({ formData, handl
             </div>
 
             <div>
-            <label className="block text-sm mb-1">Address Line 2</label>
+            <label className="block text-sm mb-1">Address Line 2(optional)</label>
             <input
               type="text"
               name="addressLine2"

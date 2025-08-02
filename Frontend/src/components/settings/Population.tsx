@@ -193,68 +193,80 @@ export default function Population() {
         </div>
       )}
       
-      <div className="space-y-8">
-        <section>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium">Students</h2>
-            <button 
-              onClick={() => setIsEditing('students')} 
-              className="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              disabled={updateLoading}
-            >
-              Update
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-8">
-            <div>
-              <p className="text-sm text-gray-500 mb-1">Males</p>
-              <p className="text-xl font-semibold">{populationData.students?.male || 0}</p>
+      <div className="grid grid-cols-3 gap-8">
+        {/* Left Column - Individual Metrics */}
+        <div className="col-span-2 space-y-8">
+          {/* Students Section */}
+          <section>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-medium">Students</h2>
+              <button 
+                onClick={() => setIsEditing('students')} 
+                className="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={updateLoading}
+              >
+                Update
+              </button>
             </div>
-            <div>
-              <p className="text-sm text-gray-500 mb-1">Females</p>
-              <p className="text-xl font-semibold">{populationData.students?.female || 0}</p>
+            
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Males</p>
+                <p className="text-xl font-semibold">{populationData.students?.male || 0}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Females</p>
+                <p className="text-xl font-semibold">{populationData.students?.female || 0}</p>
+              </div>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-green-600 mb-1">Students</p>
-              <p className="text-2xl font-semibold">
-                {populationData.students?.total || 0}
-              </p>
-              <p className="text-sm text-gray-500">Total Student Population</p>
-            </div>
-          </div>
-        </section>
+          </section>
 
-        <section>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium">Teachers</h2>
-            <button 
-              onClick={() => setIsEditing('teachers')} 
-              className="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              disabled={updateLoading}
-            >
-              Update
-            </button>
+          {/* Teachers Section */}
+          <section>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-medium">Teachers</h2>
+              <button 
+                onClick={() => setIsEditing('teachers')} 
+                className="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={updateLoading}
+              >
+                Update
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Involved in STEAM</p>
+                <p className="text-xl font-semibold">{populationData.teachers?.steamInvolved || 0}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Not Involved in STEAM</p>
+                <p className="text-xl font-semibold">{populationData.teachers?.nonSteamInvolved || 0}</p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* Right Column - Summary Cards */}
+        <div className="col-span-1 space-y-8">
+          {/* Students Summary Card */}
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <p className="text-sm text-green-600 mb-1">Students</p>
+            <p className="text-3xl font-semibold mb-2">
+              {populationData.students?.total || 0}
+            </p>
+            <p className="text-sm text-gray-500">Total Student Population</p>
           </div>
-          
-          <div className="grid grid-cols-3 gap-8">
-            <div>
-              <p className="text-sm text-gray-500 mb-1">Involved in STEAM</p>
-              <p className="text-xl font-semibold">{populationData.teachers?.steamInvolved || 0}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 mb-1">Not Involved in STEAM</p>
-              <p className="text-xl font-semibold">{populationData.teachers?.nonSteamInvolved || 0}</p>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-green-600 mb-1">Teachers</p>
-              <p className="text-2xl font-semibold">
-                {populationData.teachers?.total || 0}
-              </p>
-              <p className="text-sm text-gray-500">Total Teacher Population</p>
-            </div>
+
+          {/* Teachers Summary Card */}
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <p className="text-sm text-green-600 mb-1">Teachers</p>
+            <p className="text-3xl font-semibold mb-2">
+              {populationData.teachers?.total || 0}
+            </p>
+            <p className="text-sm text-gray-500">Total Teacher Population</p>
           </div>
-        </section>
+        </div>
       </div>
 
       {/* Student Population Update Modal */}

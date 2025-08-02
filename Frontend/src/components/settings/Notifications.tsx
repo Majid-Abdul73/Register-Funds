@@ -72,25 +72,30 @@ export default function Notifications() {
   return (
     <div>
       <h1 className='font-semibold text-2xl mb-1'>Notification Settings</h1>
-      <p className="text-gray-500 mb-8">Manage your notification preferences</p>
+      <p className="text-gray-500 mb-8">Turn on notifications to get updates about your campaign, donor messages, and important platform alerts.</p>
       
       <div className="space-y-8">
         <section>
           <div className="flex justify-between items-center mb-4">
             <div>
               <h3 className="font-medium">Email</h3>
-              <p className="text-sm text-gray-500">Receive notifications via email</p>
+              <p className="text-sm text-gray-500">Get important updates sent straight to your inbox.</p>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                className="sr-only peer" 
-                checked={settings.email}
-                onChange={(e) => updateSetting('email', e.target.checked)}
-                disabled={saving}
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-            </label>
+            <div className="flex items-center gap-3">
+              <span className={`text-sm font-medium ${settings.email ? 'text-green-600' : 'text-gray-400'}`}>
+                {settings.email ? 'ON' : 'OFF'}
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="sr-only peer" 
+                  checked={settings.email}
+                  onChange={(e) => updateSetting('email', e.target.checked)}
+                  disabled={saving}
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+              </label>
+            </div>
           </div>
         </section>
 
@@ -98,18 +103,23 @@ export default function Notifications() {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h3 className="font-medium">SMS</h3>
-              <p className="text-sm text-gray-500">Receive notifications via SMS</p>
+              <p className="text-sm text-gray-500">Get important updates and alerts by SMS.</p>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                className="sr-only peer" 
-                checked={settings.sms}
-                onChange={(e) => updateSetting('sms', e.target.checked)}
-                disabled={saving}
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-            </label>
+            <div className="flex items-center gap-3">
+              <span className={`text-sm font-medium ${settings.sms ? 'text-green-600' : 'text-gray-400'}`}>
+                {settings.sms ? 'ON' : 'OFF'}
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="sr-only peer" 
+                  checked={settings.sms}
+                  onChange={(e) => updateSetting('sms', e.target.checked)}
+                  disabled={saving}
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+              </label>
+            </div>
           </div>
         </section>
       </div>

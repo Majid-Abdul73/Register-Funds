@@ -66,7 +66,7 @@ export const createCampaign = async (req: Request, res: Response) => {
 // Get all campaigns
 export const getAllCampaigns = async (req: Request, res: Response) => {
   try {
-    const { category, featured, status, limit = 100, page = 1 } = req.query;
+    const { category, featured, status } = req.query;
     let query = campaignsCollection.where('status', '==', status || 'active');
 
     if (category) {
@@ -77,7 +77,8 @@ export const getAllCampaigns = async (req: Request, res: Response) => {
       query = query.where('featured', '==', true);
     }
 
-    const snapshot = await query.limit(Number(limit)).get();
+    // Remove limit to fetch all campaigns
+    const snapshot = await query.get();
     const campaigns: Campaign[] = [];
 
     // Collect all campaigns first

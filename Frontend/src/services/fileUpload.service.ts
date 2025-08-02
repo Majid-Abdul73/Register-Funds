@@ -14,10 +14,14 @@ export const fileUploadService = {
 
   // Upload multiple files
   uploadMultipleFiles: async (files: File[], folder: string = 'campaigns'): Promise<string[]> => {
-    const uploadPromises = files.map(file => 
-      fileUploadService.uploadFile(file, `${folder}/additional`)
-    );
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+    formData.append('folder', folder);
     
-    return Promise.all(uploadPromises);
+    const response = await api.post<{ urls: string[] }>('/upload/multiple', formData);
+    
+    return response.urls;
   },
 };

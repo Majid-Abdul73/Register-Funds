@@ -1,6 +1,7 @@
 import { Campaign } from '../../types/campaign';
 import { Link } from 'react-router-dom';
 import Loading from '../Loading';
+import { useMemo } from 'react';
 
 interface FeaturedCampaignsProps {
   campaigns?: Campaign[];
@@ -11,6 +12,15 @@ interface FeaturedCampaignsProps {
 
 export default function FeaturedCampaigns({ campaigns, loading, error, className }: FeaturedCampaignsProps) {
   const errorMessage = error instanceof Error ? error.message : String(error);
+
+  // Randomize campaigns and select first 3
+  const randomizedCampaigns = useMemo(() => {
+    if (!campaigns || campaigns.length === 0) return [];
+    
+    // Create a copy of the array and shuffle it
+    const shuffled = [...campaigns].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 3);
+  }, [campaigns]);
 
   return (
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${className || ''}`}>
@@ -26,7 +36,7 @@ export default function FeaturedCampaigns({ campaigns, loading, error, className
           ) : error ? (
             <div className="col-span-full text-center text-red-500 py-12">{errorMessage}</div>
           ) : (
-            campaigns?.slice(0, 3).map((campaign, index) => (
+            randomizedCampaigns.map((campaign, index) => (
               <Link 
                 to={`/challenge/${campaign.id}`} 
                 key={campaign.id}
@@ -76,20 +86,18 @@ export default function FeaturedCampaigns({ campaigns, loading, error, className
                           }}
                         />
                       </div>
-                      <div className="flex justify-between text-sm font-semibold mb-4">
+                      <div className="flex justify-between text-md font-semibold mb-4">
                         <span>Raised: ${campaign.amountRaised?.toLocaleString()}</span>
                         <span>Goal: ${campaign.goal?.toLocaleString()}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full shadow bg-register-green flex items-center justify-center text-white text-xs font-semibold">
-                        {campaign.organizer?.name?.charAt(0).toUpperCase()}
+                        <div className="w-10 h-10 rounded-full shadow bg-register-green flex items-center justify-center text-white text-lg font-semibold">
+                          {campaign.organizer?.name?.charAt(0).toUpperCase()}
                         </div>
                         <span className="text-sm font-semibold text-gray-600">
                           {campaign.organizer?.name || 'Anonymous Organizer'}
                         </span>
                       </div>
-                      {/* <h1>makes this challenge complaint</h1> */}
-
                     </div>
                   </div>
                 ) : (

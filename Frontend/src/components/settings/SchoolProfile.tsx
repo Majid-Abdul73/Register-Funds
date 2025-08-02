@@ -1,51 +1,17 @@
 import { useState, useEffect } from 'react';
 import { auth } from '../../config/firebase';
 import { useSchool, useUpdateSchool } from '../../hooks/useSchools';
-import { School } from '../../types/school';
+import { SchoolData } from '../../types/schoolProfile';
+import { convertSchoolToSchoolData } from '../../utils/schoolProfileUtils';
+import BasicInfoSection from './sections/BasicInfoSection';
+import AddressSection from './sections/AddressSection';
+import ContactSection from './sections/ContactSection';
 import { toast } from 'react-hot-toast';
-
-interface SchoolData {
-  schoolName: string;
-  schoolType: string;
-  country: string;
-  city: string;
-  postalAddress?: string;
-  email: string;
-  phone: string;
-}
-
-// Helper function to convert School API data to SchoolData format
-const convertSchoolToSchoolData = (school: School): SchoolData => ({
-  schoolName: school.schoolName,
-  schoolType: school.schoolType,
-  country: school.country,
-  city: school.city,
-  postalAddress: '',
-  email: school.email,
-  phone: school.phone
-});
-
-// Helper function to convert SchoolData to School API format
-export const convertSchoolDataToSchool = (schoolData: SchoolData): Partial<School> => ({
-  schoolName: schoolData.schoolName,
-  schoolType: schoolData.schoolType,
-  country: schoolData.country,
-  city: schoolData.city,
-  email: schoolData.email,
-  phone: schoolData.phone
-});
 
 export default function SchoolProfile() {
   const [schoolData, setSchoolData] = useState<SchoolData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Edit mode states
-  const [editingBasicInfo, setEditingBasicInfo] = useState(false);
-  const [editingAddress, setEditingAddress] = useState(false);
-  const [editingContact, setEditingContact] = useState(false);
-  
-  // Form data for editing
   const [formData, setFormData] = useState<SchoolData | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -87,18 +53,16 @@ export default function SchoolProfile() {
       [e.target.name]: e.target.value
     });
   };
+
+  const handleCancel = () => {
+    setFormData(schoolData);
+  };
   
   const handleSaveBasicInfo = async () => {
     if (!formData || !userId) return;
     
     try {
       setSaving(true);
-      
-      // Update via API
-      // const updateData = {
-      //   name: formData.schoolName,
-      //   type: formData.schoolType
-      // };
       
       await updateSchoolMutation.mutateAsync({
         id: userId,
@@ -115,7 +79,7 @@ export default function SchoolProfile() {
         schoolType: formData.schoolType
       });
       
-      setEditingBasicInfo(false);
+      toast.success('Basic information updated successfully');
     } catch (err) {
       console.error('Error updating basic info:', err);
       toast.error('Failed to update basic information');
@@ -130,10 +94,13 @@ export default function SchoolProfile() {
     try {
       setSaving(true);
       
-      // Update via API
       const updateData = {
-        country: formData.country,
-        city: formData.city
+        addressLine1: formData.addressLine1,
+        addressLine2: formData.addressLine2,
+        digitalAddress: formData.digitalAddress,
+        city: formData.city,
+        district: formData.district,
+        country: formData.country
       };
       
       await updateSchoolMutation.mutateAsync({
@@ -144,12 +111,10 @@ export default function SchoolProfile() {
       // Update local state
       setSchoolData({
         ...schoolData!,
-        country: formData.country,
-        city: formData.city,
-        postalAddress: formData.postalAddress
+        ...updateData
       });
       
-      setEditingAddress(false);
+      toast.success('Address updated successfully');
     } catch (err) {
       console.error('Error updating address:', err);
       toast.error('Failed to update address information');
@@ -164,10 +129,10 @@ export default function SchoolProfile() {
     try {
       setSaving(true);
       
-      // Update via API
       const updateData = {
         email: formData.email,
-        phone: formData.phone
+        phone: formData.phone,
+        postalAddress: formData.postalAddress
       };
       
       await updateSchoolMutation.mutateAsync({
@@ -178,11 +143,10 @@ export default function SchoolProfile() {
       // Update local state
       setSchoolData({
         ...schoolData!,
-        email: formData.email,
-        phone: formData.phone
+        ...updateData
       });
       
-      setEditingContact(false);
+      toast.success('Contact information updated successfully');
     } catch (err) {
       console.error('Error updating contact info:', err);
       toast.error('Failed to update contact information');
@@ -199,7 +163,7 @@ export default function SchoolProfile() {
     return <div className="text-red-500 py-8">{error || 'Failed to load school profile'}</div>;
   }
 
-  if (!schoolData) {
+  if (!schoolData || !formData) {
     return <div className="py-8">No school profile data available</div>;
   }
 
@@ -212,243 +176,33 @@ export default function SchoolProfile() {
       <p className="text-gray-500 mb-8">Update your school profile now—trusted campaigns receive more visibility and funding.</p>
       
       <div className="space-y-8">
-        <section>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium text-register-green">Basic Info</h2>
-            {editingBasicInfo ? (
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => {
-                    setFormData(schoolData);
-                    setEditingBasicInfo(false);
-                  }}
-                  className="px-4 py-2 text-sm bg-gray-100 rounded-lg"
-                  disabled={saving}
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleSaveBasicInfo}
-                  className="px-4 py-2 text-sm bg-register-green text-white rounded-lg"
-                  disabled={saving}
-                >
-                  {saving ? 'Saving...' : 'Save'}
-                </button>
-              </div>
-            ) : (
-              <button 
-                onClick={() => setEditingBasicInfo(true)}
-                className="px-4 py-2 text-sm bg-gray-100 rounded-lg"
-              >
-                Edit
-              </button>
-            )}
-          </div>
-          
-          {editingBasicInfo ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-500 mb-1">School Name</label>
-                <input
-                  type="text"
-                  name="schoolName"
-                  value={formData?.schoolName || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 mb-1">School Type</label>
-                <select
-                  name="schoolType"
-                  value={formData?.schoolType || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="">Select school type</option>
-                  <option value="Public">Public</option>
-                  <option value="Private">Private</option>
-                </select>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl">
-                {schoolInitial}
-              </div>
-              <div>
-                <h3 className="font-medium">{schoolData.schoolName}</h3>
-                <p className="text-gray-500">{schoolData.schoolType} School</p>
-              </div>
-            </div>
-          )}
-        </section>
+        <BasicInfoSection
+          schoolData={schoolData}
+          formData={formData}
+          saving={saving}
+          onInputChange={handleInputChange}
+          onSave={handleSaveBasicInfo}
+          onCancel={handleCancel}
+          schoolInitial={schoolInitial}
+        />
 
-        <section>
-          <div className="flex justify-between items-center mb-4 border-t-2 py-4">
-            <h2 className="text-lg font-medium text-register-green">Address</h2>
-            {editingAddress ? (
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => {
-                    setFormData(schoolData);
-                    setEditingAddress(false);
-                  }}
-                  className="px-4 py-2 text-sm bg-gray-100 rounded-lg"
-                  disabled={saving}
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleSaveAddress}
-                  className="px-4 py-2 text-sm bg-register-green text-white rounded-lg"
-                  disabled={saving}
-                >
-                  {saving ? 'Saving...' : 'Save'}
-                </button>
-              </div>
-            ) : (
-              <button 
-                onClick={() => setEditingAddress(true)}
-                className="px-4 py-2 text-sm bg-gray-100 rounded-lg"
-              >
-                Edit
-              </button>
-            )}
-          </div>
-          
-          {editingAddress ? (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-500 mb-1">Country</label>
-                <select
-                  name="country"
-                  value={formData?.country || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="">Select country</option>
-                  <option value="Ghana">Ghana</option>
-                  <option value="Nigeria">Nigeria</option>
-                  <option value="Kenya">Kenya</option>
-                  <option value="South Africa">South Africa</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 mb-1">City</label>
-                <select
-                  name="city"
-                  value={formData?.city || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="">Select city</option>
-                  <option value="Accra">Accra</option>
-                  <option value="Kumasi">Kumasi</option>
-                  <option value="Lagos">Lagos</option>
-                  <option value="Nairobi">Nairobi</option>
-                  <option value="Cape Coast">Cape Coast</option>
-                </select>
-              </div>
-              <div className="col-span-2">
-                <label className="block text-sm text-gray-500 mb-1">Postal Address</label>
-                <input
-                  type="text"
-                  name="postalAddress"
-                  value={formData?.postalAddress || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                  placeholder="Not synced with API - local storage only"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-8">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Country</p>
-                <p>{schoolData.country}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">City</p>
-                <p>{schoolData.city}</p>
-              </div>
-              <div className="col-span-2">
-                <p className="text-sm text-gray-500 mb-1">Postal Address</p>
-                <p>{schoolData.postalAddress || 'Not provided'}</p>
-              </div>
-            </div>
-          )}
-        </section>
+        <AddressSection
+          schoolData={schoolData}
+          formData={formData}
+          saving={saving}
+          onInputChange={handleInputChange}
+          onSave={handleSaveAddress}
+          onCancel={handleCancel}
+        />
 
-        <section>
-          <div className="flex justify-between items-center mb-4 border-t-2 py-4">
-            <h2 className="text-lg font-medium text-register-green">Contact Information</h2>
-            {editingContact ? (
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => {
-                    setFormData(schoolData);
-                    setEditingContact(false);
-                  }}
-                  className="px-4 py-2 text-sm bg-gray-100 rounded-lg"
-                  disabled={saving}
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleSaveContact}
-                  className="px-4 py-2 text-sm bg-register-green text-white rounded-lg"
-                  disabled={saving}
-                >
-                  {saving ? 'Saving...' : 'Save'}
-                </button>
-              </div>
-            ) : (
-              <button 
-                onClick={() => setEditingContact(true)}
-                className="px-4 py-2 text-sm bg-gray-100 rounded-lg"
-              >
-                Edit
-              </button>
-            )}
-          </div>
-          
-          {editingContact ? (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm text-gray-500 mb-1">Email Address</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData?.email || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-gray-500 mb-1">Phone</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData?.phone || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-8">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Email Address</p>
-                <p>{schoolData.email}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Phone</p>
-                <p>{schoolData.phone}</p>
-              </div>
-            </div>
-          )}
-        </section>
+        <ContactSection
+          schoolData={schoolData}
+          formData={formData}
+          saving={saving}
+          onInputChange={handleInputChange}
+          onSave={handleSaveContact}
+          onCancel={handleCancel}
+        />
       </div>
     </div>
   );

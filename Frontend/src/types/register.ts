@@ -18,6 +18,7 @@ export interface FormData {
   email: string;
   phone: string;
   staffId: string;
+  emisCode: string; // Add EMIS Code field
   password: string;
   confirmPassword: string;
   acceptTerms: boolean;
