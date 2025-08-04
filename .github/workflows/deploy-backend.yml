@@ -1,4 +1,4 @@
-name: Deploy Backend to AWS
+name: Deploy Backend to AWS EC2
 
 on:
   push:
@@ -10,10 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
@@ -31,21 +32,42 @@ jobs:
       working-directory: ./Backend
       run: npm run build
     
+    - name: Create deployment package
+      working-directory: ./Backend
+      run: |
+        zip -r ../backend-deploy.zip . -x "*.git*" "node_modules/*" "*.env*" "tests/*" "*.test.*"
+        mv ../backend-deploy.zip .
+    
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
     
-    - name: Deploy to Elastic Beanstalk
+    - name: Upload to S3
       working-directory: ./Backend
       run: |
-        zip -r deploy.zip . -x "*.git*" "node_modules/*" "*.env*"
-        aws elasticbeanstalk create-application-version \
-          --application-name your-app-backend \
-          --version-label ${{ github.sha }} \
-          --source-bundle S3Bucket=your-deployment-bucket,S3Key=deploy.zip
-        aws elasticbeanstalk update-environment \
-          --environment-name your-app-backend-env \
-          --version-label ${{ github.sha }}
+        aws s3 cp backend-deploy.zip s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/backend-deploy-${{ github.sha }}.zip
+    
+    - name: Deploy to EC2
+      run: |
+        aws ssm send-command \
+          --document-name "AWS-RunShellScript" \
+          --parameters 'commands=[
+            "cd /home/ubuntu/app",
+            "sudo systemctl stop backend",
+            "aws s3 cp s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/backend-deploy-${{ github.sha }}.zip ./backend-deploy.zip",
+            "sudo rm -rf backend-old",
+            "sudo mv backend backend-old || true",
+            "sudo mkdir -p backend",
+            "sudo unzip -o backend-deploy.zip -d backend/",
+            "cd backend",
+            "sudo npm ci --production",
+            "sudo chown -R ubuntu:ubuntu /home/ubuntu/app",
+            "sudo systemctl start backend",
+            "sudo systemctl enable backend",
+            "rm ../backend-deploy.zip"
+          ]' \
+          --targets "Key=tag:Name,Values=${{ secrets.EC2_INSTANCE_NAME }}" \
+          --region ${{ secrets.AWS_REGION || 'us-east-1' }}
